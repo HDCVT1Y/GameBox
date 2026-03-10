@@ -1,64 +1,49 @@
-/* Add this to your style.css */
-body {
+/* Rock-Paper-Scissors — Game-specific styles */
+
+.rps-arena {
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background: linear-gradient(to bottom right, #43cea2, #185a9d);
-    font-family: 'Quicksand', sans-serif;
-    color: #fff;
+    gap: 2rem;
+    margin: 1.2rem 0;
 }
 
-.container {
+.rps-column {
     text-align: center;
 }
 
-.game-container {
-    display: flex;
-    justify-content: space-around;
-    margin: 20px 0;
+.rps-column h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gb-text-muted);
+    margin-bottom: 0.8rem;
 }
 
-.choice-container {
-    width: 200px;
-}
-
-.btn {
+.rps-btn {
     display: block;
     width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    font-size: 16px;
-    background-color: #343a40;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    margin-bottom: 0.5rem;
+    min-width: 140px;
 }
 
-.btn:hover {
-    background-color: #23272b;
+.rps-display {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gb-accent);
+    padding: 1rem;
+    border: 2px solid var(--gb-border);
+    border-radius: var(--gb-radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+    min-width: 140px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-#result {
-    font-size: 24px;
-    margin-bottom: 20px;
+@media (max-width: 500px) {
+    .rps-arena {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
 }
-
-#scoreboard {
-    font-size: 18px;
-}
-
-#scoreboard span {
-    font-weight: bold;
-}
-
-.text-center {
-    text-align: center;
-}
-/* #computer-move{
-    margin-left: 3%;
-    padding: 29%;
-} */

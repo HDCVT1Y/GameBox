@@ -1,59 +1,119 @@
-// Hangman game logic
+// === Word lists by difficulty ===
+const wordLists = {
+    easy:   ['cat', 'dog', 'sun', 'hat', 'ball', 'fish', 'tree', 'cake', 'moon', 'star', 'book', 'rain'],
+    medium: ['hangman', 'javascript', 'developer', 'coding', 'challenge', 'victory', 'function', 'variable', 'boolean', 'promise', 'closure', 'template'],
+    hard:   ['asynchronous', 'encapsulation', 'polymorphism', 'abstraction', 'interpolation', 'concatenation', 'serialization', 'authentication', 'middleware', 'coefficient']
+};
 
-const words = ['hangman', 'javascript', 'developer', 'simple', 'coding', 'challenge', 'victory', 'quicksand'];
+const maxWrong = { easy: 8, medium: 6, hard: 5 };
 
+let currentDifficulty = 'easy';
 let selectedWord = '';
 let guessedLetters = [];
 let hangmanDisplay = '';
+let incorrectCount = 0;
 let wins = 0;
 let losses = 0;
+let gameOver = false;
 
-const hangmanContainer = document.getElementById('hangman');
+// === DOM Elements ===
+const hangmanFigure = document.getElementById('hangman-figure');
 const wordDisplay = document.getElementById('word-display');
 const alphabetContainer = document.getElementById('alphabet');
 const hintBtn = document.getElementById('hint-btn');
 const winsDisplay = document.getElementById('wins');
 const lossesDisplay = document.getElementById('losses');
+const modal = document.getElementById('win-modal');
+const newGameBtn = document.getElementById('new-game-btn');
+const closeBtn = document.querySelector('.close');
+const diffButtons = document.querySelectorAll('#difficulty-selector .gb-btn');
 
-// Set up hint button click event
-hintBtn.addEventListener('click', () => {
-    provideHint();
-});
-
-// Function to pick a random word
-function getRandomWord() {
-    return words[Math.floor(Math.random() * words.length)].toUpperCase();
+// === Sound helper (Web Audio API — no files needed) ===
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playTone(freq, duration, type = 'sine') {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.value = 0.12;
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.stop(audioCtx.currentTime + duration);
 }
 
-// Function to initialize the game
+// === Event listeners ===
+hintBtn.addEventListener('click', provideHint);
+closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
+newGameBtn.addEventListener('click', () => { modal.style.display = 'none'; resetGame(); });
+
+diffButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        diffButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentDifficulty = btn.dataset.diff;
+        resetGame();
+    });
+});
+
+// Keyboard support
+document.addEventListener('keydown', (e) => {
+    if (gameOver) return;
+    const letter = e.key.toUpperCase();
+    if (/^[A-Z]$/.test(letter)) {
+        handleLetterClick(letter);
+    }
+});
+
+// === Hangman figure drawing ===
+const hangmanParts = [
+    '<div class="hm-head"></div>',
+    '<div class="hm-body"></div>',
+    '<div class="hm-arm-left"></div>',
+    '<div class="hm-arm-right"></div>',
+    '<div class="hm-leg-left"></div>',
+    '<div class="hm-leg-right"></div>',
+    '<div class="hm-foot-left"></div>',
+    '<div class="hm-foot-right"></div>'
+];
+
+function drawHangman() {
+    const allowed = maxWrong[currentDifficulty];
+    let html = '<div class="hm-gallows"></div>';
+    for (let i = 0; i < Math.min(incorrectCount, hangmanParts.length); i++) {
+        html += hangmanParts[i];
+    }
+    hangmanFigure.innerHTML = html;
+}
+
+// === Core functions ===
+function getRandomWord() {
+    const list = wordLists[currentDifficulty];
+    return list[Math.floor(Math.random() * list.length)].toUpperCase();
+}
+
 function initGame() {
     selectedWord = getRandomWord();
     guessedLetters = [];
     hangmanDisplay = '_'.repeat(selectedWord.length);
+    incorrectCount = 0;
+    gameOver = false;
 
-    updateHangmanDisplay();
+    drawHangman();
     updateWordDisplay();
     updateAlphabet();
     updateWins();
     updateLosses();
 }
 
-// Function to update the hangman display
-function updateHangmanDisplay() {
-    hangmanContainer.textContent = hangmanDisplay;
-}
-
-// Function to update the word display
 function updateWordDisplay() {
     const displayText = selectedWord
         .split('')
         .map((char, index) => (char === ' ' ? ' ' : hangmanDisplay[index]))
         .join(' ');
-
     wordDisplay.textContent = displayText;
 }
 
-// Function to update the alphabet container
 function updateAlphabet() {
     alphabetContainer.innerHTML = '';
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -62,20 +122,29 @@ function updateAlphabet() {
         const letterBtn = document.createElement('div');
         letterBtn.classList.add('alphabet-letter');
         letterBtn.textContent = letter;
-        letterBtn.addEventListener('click', () => handleLetterClick(letter));
+
+        if (guessedLetters.includes(letter)) {
+            letterBtn.classList.add('disabled');
+            if (selectedWord.includes(letter)) {
+                letterBtn.classList.add('correct');
+            } else {
+                letterBtn.classList.add('wrong');
+            }
+        } else {
+            letterBtn.addEventListener('click', () => handleLetterClick(letter));
+        }
+
         alphabetContainer.appendChild(letterBtn);
     }
 }
 
-// Function to handle letter clicks
 function handleLetterClick(letter) {
-    if (!guessedLetters.includes(letter)) {
-        guessedLetters.push(letter);
-        checkGuess(letter);
-    }
+    if (gameOver || guessedLetters.includes(letter)) return;
+    guessedLetters.push(letter);
+    checkGuess(letter);
+    updateAlphabet();
 }
 
-// Function to check if the guessed letter is in the word
 function checkGuess(letter) {
     let correctGuess = false;
 
@@ -86,70 +155,55 @@ function checkGuess(letter) {
         }
     }
 
-    updateHangmanDisplay();
+    if (correctGuess) {
+        playTone(660, 0.15);
+    } else {
+        incorrectCount++;
+        playTone(200, 0.3, 'sawtooth');
+        drawHangman();
+    }
+
     updateWordDisplay();
 
     if (!hangmanDisplay.includes('_')) {
         handleWin();
+        return;
     }
 
-    if (!correctGuess) {
-        handleIncorrectGuess();
-    }
-}
-
-// Function to replace a character at a specific index in a string
-function replaceAt(str, index, replacement) {
-    return str.substr(0, index) + replacement + str.substr(index + 1);
-}
-
-// Function to handle incorrect guesses
-function handleIncorrectGuess() {
-    const incorrectGuesses = guessedLetters.filter(letter => !selectedWord.includes(letter));
-
-    if (incorrectGuesses.length >= 6) {
+    if (incorrectCount >= maxWrong[currentDifficulty]) {
         handleLoss();
     }
 }
 
-// Update handleWin function in script.js
+function replaceAt(str, index, replacement) {
+    return str.substring(0, index) + replacement + str.substring(index + 1);
+}
+
 function handleWin() {
+    gameOver = true;
     wins++;
     updateWins();
-    showWinModal();
-    // Comment out or remove the resetGame() call so the modal stays open until the player decides to start a new game
-    // resetGame();
-}
-
-// Function to show the win modal
-function showWinModal() {
-    const modal = document.getElementById('win-modal');
-    const newGameBtn = document.getElementById('new-game-btn');
+    playTone(523, 0.12); setTimeout(() => playTone(659, 0.12), 120); setTimeout(() => playTone(784, 0.25), 240);
     modal.style.display = 'flex';
-
-    // Close the modal when the close button is clicked
-    const closeBtn = document.querySelector('.close');
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-
-    // Close the modal and start a new game when the New Game button is clicked
-    newGameBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-        resetGame();
-    });
+    newGameBtn.focus();
 }
 
-// Function to handle a loss
 function handleLoss() {
+    gameOver = true;
     losses++;
     updateLosses();
-    resetGame();
+    playTone(150, 0.5, 'sawtooth');
+    wordDisplay.textContent = selectedWord.split('').join(' ');
+    wordDisplay.classList.add('reveal');
+    setTimeout(() => {
+        wordDisplay.classList.remove('reveal');
+        resetGame();
+    }, 2000);
 }
 
-// Function to provide a hint by revealing a letter in the word
 function provideHint() {
-    let unrevealedIndexes = [];
+    if (gameOver) return;
+    const unrevealedIndexes = [];
     for (let i = 0; i < selectedWord.length; i++) {
         if (selectedWord[i] !== ' ' && !guessedLetters.includes(selectedWord[i])) {
             unrevealedIndexes.push(i);
@@ -158,26 +212,21 @@ function provideHint() {
 
     if (unrevealedIndexes.length > 0) {
         const randomIndex = unrevealedIndexes[Math.floor(Math.random() * unrevealedIndexes.length)];
-        hangmanDisplay = replaceAt(hangmanDisplay, randomIndex, selectedWord[randomIndex]);
-        updateHangmanDisplay();
+        const revealedLetter = selectedWord[randomIndex];
+        guessedLetters.push(revealedLetter);
+        hangmanDisplay = replaceAt(hangmanDisplay, randomIndex, revealedLetter);
+        playTone(880, 0.1);
         updateWordDisplay();
+        updateAlphabet();
+
+        if (!hangmanDisplay.includes('_')) {
+            handleWin();
+        }
     }
 }
 
-// Function to reset the game
-function resetGame() {
-    initGame();
-}
+function resetGame() { initGame(); }
+function updateWins() { winsDisplay.textContent = wins; }
+function updateLosses() { lossesDisplay.textContent = losses; }
 
-// Function to update the wins display
-function updateWins() {
-    winsDisplay.textContent = wins;
-}
-
-// Function to update the losses display
-function updateLosses() {
-    lossesDisplay.textContent = losses;
-}
-
-// Initialize the game
 initGame();
