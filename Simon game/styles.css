@@ -1,79 +1,68 @@
+/* Simon Game — Game-specific styles */
 
-body {
-  text-align: center;
-  background-color: #011F3F;
+.simon-shell {
+    max-width: 420px;
 }
 
-#level-title {
-  font-family: 'Press Start 2P', cursive;
-  font-size: 3rem;
-  margin: 5% auto;
-  color: #FEF2BF;
+.simon-shell h1 {
+    font-size: 1.2rem;
+    color: var(--gb-text);
+    margin-bottom: 1.2rem;
 }
 
-.container {
-  width: 80%; 
-  margin: auto;
+.simon-board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 1.2rem;
 }
 
-.row {
-  display: flex;
-  justify-content: center;
+.simon-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
 }
 
-.btn {
-  margin: 2%;
-  display: inline-block;
-  height: 100px; 
-  width: 100px; 
-  border: 10px solid black;
-  border-radius: 20%;
+.simon-btn {
+    display: inline-block;
+    height: 100px;
+    width: 100px;
+    border: 4px solid var(--gb-border);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.simon-btn:hover {
+    opacity: 0.85;
+}
+
+.simon-btn.red {
+    background-color: #e53e3e;
+}
+
+.simon-btn.green {
+    background-color: #38a169;
+}
+
+.simon-btn.blue {
+    background-color: #3182ce;
+}
+
+.simon-btn.yellow {
+    background-color: #d69e2e;
+}
+
+.simon-btn.pressed {
+    box-shadow: 0 0 18px rgba(56, 178, 172, 0.5);
+    filter: brightness(1.3);
 }
 
 .game-over {
-  background-color: red;
-  opacity: 0.8;
-}
-
-.red {
-  background-color: red;
-}
-
-.green {
-  background-color: green;
-}
-
-.blue {
-  background-color: blue;
-}
-
-.yellow {
-  background-color: yellow;
-}
-
-.pressed {
-  box-shadow: 0 0 20px white;
-  background-color: grey;
+    background-color: rgba(245, 101, 101, 0.15) !important;
 }
 
 p {
-  color: aliceblue;
-}
-
-#start-button {
-  background-color: #4CAF50; 
-  border: none; 
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px; 
-  margin: 20px auto;
-  cursor: pointer; 
-  border-radius: 8px; 
-}
-
-#start-button:hover {
-  background-color: #45a049; 
+    color: var(--gb-text-muted);
 }

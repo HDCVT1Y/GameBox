@@ -1,108 +1,104 @@
-//cards
-let firstCard = Math.floor(Math.random() * 13) + 1;
-let secondCard = Math.floor(Math.random() * 13) + 1;
-let extraCard
-extraCard = []
-let i = 0
-extraCard[i] = 0
-let sum = firstCard + secondCard
-//status of game
-let hasBlackJack = false
-let isAlive = true
-let state = 1
-//texts
-let resultEL = document.getElementById("message-El")
-let sumEl = document.querySelector("#sum-El")
-let cardsEl = document.querySelector("#cards-El")
-let message = ""
+// Sound helper (Web Audio API)
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playTone(freq, duration, type = 'sine') {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.value = 0.12;
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.stop(audioCtx.currentTime + duration);
+}
 
+// Draw a random card value (1-10, face cards = 10, ace = 11)
+function drawCard() {
+    const raw = Math.floor(Math.random() * 13) + 1;
+    if (raw > 10) return 10;  // J, Q, K
+    if (raw === 1) return 11; // Ace (simplified)
+    return raw;
+}
 
-//functions
+let cards = [];
+let sum = 0;
+let hasBlackJack = false;
+let isAlive = true;
+let gameStarted = false;
+let bjWins = parseInt(localStorage.getItem('bj_wins'), 10) || 0;
+let bjLosses = parseInt(localStorage.getItem('bj_losses'), 10) || 0;
+
+const resultEl = document.getElementById('message-El');
+const sumEl = document.querySelector('#sum-El');
+const cardsEl = document.querySelector('#cards-El');
+
+function renderState() {
+    cardsEl.textContent = 'Cards: ' + cards.join(', ');
+    sumEl.textContent = 'Sum: ' + sum;
+}
+
 function startGame() {
-    if (state === 1) {
-        state = 3
-        cardsEl.textContent = "Cards: " + firstCard + ", " + secondCard
-        sumEl.textContent = "Sum: " + sum
-        if (sum <= 20) {
-            display("Do you want to draw a new card?", true, false)
-        }
-        else if (sum === 21) {
-            display("Congrats! You've won the Blackjack!!", true, true)
-        }
-        else {
-            display("You are out of the game!", false, false)
-        }
+    if (gameStarted) return;
+    gameStarted = true;
+    isAlive = true;
+    hasBlackJack = false;
 
-        console.log(hasBlackJack)
-        console.log(isAlive)
-    }
-    else if (state === 2) {
-        sumEl.textContent = "Sum: " + sum
-        if (sum <= 20) {
-            display("Do you want to draw a new card?", true, false)
-        }
-        else if (sum === 21) {
-            display("Congrats! You've won the Blackjack!!", true, true)
-        }
-        else {
-            display("You are out of the game!", false, false)
-            resultEL.style.color="red"
-        }
+    cards = [drawCard(), drawCard()];
+    sum = cards.reduce((a, b) => a + b, 0);
 
-        console.log(hasBlackJack)
-        console.log(isAlive)
-    }
-    else if (state === 3) {
-        cardsEl.textContent = "You are in middle of a game!"
-        sumEl.textContent = "To Start Fresh, Click on New Game"
-    }
-    else {
-        cardsEl.textContent = "Game Over!"
-        sumEl.textContent = "Click on New Game"
+    playTone(520, 0.1);
+    renderState();
+    evaluateHand();
+}
+
+function evaluateHand() {
+    if (sum === 21) {
+        hasBlackJack = true;
+        isAlive = false;
+        bjWins++;
+        persistScores();
+        resultEl.textContent = "Congrats! You've got Blackjack!";
+        resultEl.style.color = '#4CAF50';
+        playTone(523, 0.12); setTimeout(() => playTone(659, 0.12), 120); setTimeout(() => playTone(784, 0.25), 240);
+    } else if (sum > 21) {
+        isAlive = false;
+        bjLosses++;
+        persistScores();
+        resultEl.textContent = 'You went over 21 — bust!';
+        resultEl.style.color = 'red';
+        playTone(150, 0.4, 'sawtooth');
+    } else {
+        resultEl.textContent = 'Do you want to draw a new card?';
+        resultEl.style.color = 'white';
     }
 }
 
 function newCard() {
-    state = 2
-    if (sum > 21) {
-        state = 0
-        cardsEl.textContent = "Game Over!"
-        sumEl.textContent = "Start a New Game"
-        return;
-    }
-    extraCard[++i] = Math.floor(Math.random() * 13) + 1;
-    sum += extraCard[i]
+    if (!gameStarted || !isAlive || hasBlackJack) return;
 
-    sumEl.textContent = "Sum: " + sum
-    console.log("Drawing a new card")
-    startGame()
-    cardsEl.textContent += ", " + extraCard[i]
+    const card = drawCard();
+    cards.push(card);
+    sum += card;
+
+    playTone(440, 0.08);
+    renderState();
+    evaluateHand();
 }
 
 function newGame() {
-    state = 1
-    firstCard = 0
-    secondCard = 0
-    sum = firstCard + secondCard
-    extraCard.fill(0)
-    cardsEl.textContent = "Cards: " + firstCard + ", " + secondCard
-    sumEl.textContent = "Sum: " + sum
-    reset()
+    gameStarted = false;
+    isAlive = true;
+    hasBlackJack = false;
+    cards = [];
+    sum = 0;
+
+    cardsEl.textContent = 'Cards:';
+    sumEl.textContent = 'Sum:';
+    resultEl.textContent = 'Click Play to start';
+    resultEl.style.color = 'white';
 }
 
-function reset() {
-    firstCard = Math.floor(Math.random() * 13) + 1;
-    secondCard = Math.floor(Math.random() * 13) + 1;
-    extraCard.fill(0)
-    sum = firstCard + secondCard
-    message = "Click on Play to start the game"
-    resultEL.textContent = message
-    resultEL.style.color = "white"
-}
-
-function display(message, isAlive, hasBlackJack) {
-    resultEL.textContent = message
-    console.log(message)
-    isAlive = isAlive
-    hasBlackJack = hasBlackJack
+function persistScores() {
+    localStorage.setItem('bj_wins', bjWins);
+    localStorage.setItem('bj_losses', bjLosses);
 }

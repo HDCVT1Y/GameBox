@@ -26,7 +26,7 @@ $(document).keypress(function() {
   startGame();
 });
 
-$(".btn").click(function() {
+$(".simon-btn").click(function() {
   if (started) {
     var userChosenColour = $(this).attr("id");
     userClickedPattern.push(userChosenColour);
