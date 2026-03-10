@@ -57,7 +57,7 @@ function evaluateHand() {
         isAlive = false;
         bjWins++;
         persistScores();
-        resultEl.textContent = "Congrats! You've got Blackjack!";
+        resultEl.textContent = 'Congrats! You\'ve got Blackjack!';
         resultEl.style.color = '#4CAF50';
         playTone(523, 0.12); setTimeout(() => playTone(659, 0.12), 120); setTimeout(() => playTone(784, 0.25), 240);
     } else if (sum > 21) {

@@ -47,7 +47,7 @@ GameBox/
 │   ├── index.html
 │   ├── script.js           # 3 grid sizes, move counter, best score, sound
 │   └── style.css
-├── Simon game/
+├── simon-game/
 │   ├── index.html
 │   ├── game.js             # jQuery-based, uses sound files
 │   ├── styles.css
@@ -131,7 +131,7 @@ GameBox/
 - **Key functions:** `buildSymbols()`, `createBoard()`, `flipCard()`, `checkMatch()`, `resetGame()`, `updateStats()`
 - **Symbols pool:** A through L (12 unique symbols max)
 
-### 3.5 Simon Game (`Simon game/`)
+### 3.5 Simon Game (`simon-game/`)
 - **Type:** Solo
 - **Font:** Press Start 2P
 - **Theme:** Dark background with colored buttons (red, blue, green, yellow)
@@ -317,7 +317,7 @@ CSS: fixed top-left, white text, 0.8 opacity with hover-to-1 transition.
 
 - **No package manager needed** — `package.json` exists only for metadata. No `npm install` required.
 - **To run locally:** Open `index.html` in any browser. No server needed (all relative paths).
-- **Simon Game sounds:** Must keep `Simon game/sounds/` directory with `.mp3` files intact.
-- **URL encoding:** Simon Game folder contains a space — hub page links to it as `Simon%20game/index.html`.
+- **Simon Game sounds:** Must keep `simon-game/sounds/` directory with `.mp3` files intact.
+- **URL encoding:** Simon Game folder originally contained a space; now renamed to `simon-game/` for consistency.
 - **BlackJack CSS file** is named `styles.css` (plural), not `style.css` — inconsistent with other games.
 - **Simon Game CSS file** is also `styles.css` (plural) and its JS file is `game.js`, not `script.js`.

@@ -185,6 +185,7 @@ function handleWin() {
     updateWins();
     playTone(523, 0.12); setTimeout(() => playTone(659, 0.12), 120); setTimeout(() => playTone(784, 0.25), 240);
     modal.style.display = 'flex';
+    newGameBtn.focus();
 }
 
 function handleLoss() {

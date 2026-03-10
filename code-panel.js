@@ -43,7 +43,7 @@
             } else if (code[i] === '/' && code[i + 1] === '/') {
                 var e2 = code.indexOf('\n', i); if (e2 < 0) e2 = n;
                 T.push({ t: 'c', v: code.slice(i, e2) }); i = e2;
-            } else if (code[i] === '"' || code[i] === "'" || code[i] === '`') {
+            } else if (code[i] === '"' || code[i] === '\'' || code[i] === '`') {
                 var q = code[i], j = i + 1;
                 while (j < n && code[j] !== q) { if (code[j] === '\\') j++; j++; }
                 if (j < n) j++;
@@ -304,9 +304,11 @@
             html = html.replace('<head>', '<head><base href="' + esc(base) + '">');
             // Remove code-panel to avoid recursion
             html = html.replace(/<link[^>]*code-panel[^>]*>/gi, '');
+            // eslint-disable-next-line no-useless-escape
             html = html.replace(/<script[^>]*code-panel[^>]*><\/script>/gi, '');
             // Replace game script with modified code
             var escaped = scriptSrc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            // eslint-disable-next-line no-useless-escape
             var pat = new RegExp('<script\\s+src=["\']' + escaped + '["\']\\s*><\\/script>');
             html = html.replace(pat, '<script>' + modified + '<\/script>');
 

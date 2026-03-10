@@ -146,6 +146,7 @@
         winnerTitle.textContent = (winner === 'red' ? '🔴 Red' : '🟡 Yellow') + ' Wins!';
         winnerText.textContent = 'Congratulations!';
         modal.style.display = 'flex';
+        playAgainBtn.focus();
     }
 
     // @section AI Opponent

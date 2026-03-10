@@ -99,7 +99,7 @@ function checkWinner() {
 
     if (!gameBoard.includes('')) {
         gameActive = false;
-        showWinnerModal("It's a draw!");
+        showWinnerModal('It\'s a draw!');
         return true;
     }
     return false;
@@ -158,6 +158,8 @@ function highlightWinnerCells(cells) {
 function showWinnerModal(message) {
     winnerText.textContent = message;
     winnerModal.style.display = 'flex';
+    // move focus into the dialog for screen readers
+    playAgainBtn.focus();
     if (message.includes('wins')) {
         playTone(523, 0.12); setTimeout(() => playTone(659, 0.12), 120); setTimeout(() => playTone(784, 0.25), 240);
     } else {
@@ -179,7 +181,7 @@ function resetGame() {
 
 function updateTurnIndicator() {
     if (gameMode === 'ai') {
-        turnIndicator.textContent = currentPlayer === 'X' ? "Your turn (X)" : "Computer thinking…";
+        turnIndicator.textContent = currentPlayer === 'X' ? 'Your turn (X)' : 'Computer thinking…';
     } else {
         turnIndicator.textContent = `Player ${currentPlayer}'s turn`;
     }

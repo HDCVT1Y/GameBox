@@ -8,7 +8,10 @@ const ASSETS = [
     '/GameBox/common.css',
     '/GameBox/script.js',
     '/GameBox/favicon.svg',
-    '/GameBox/manifest.json'
+    '/GameBox/manifest.json',
+    '/GameBox/simon-game/index.html',
+    '/GameBox/simon-game/styles.css',
+    '/GameBox/simon-game/game.js'
 ];
 
 // Install — pre-cache core assets

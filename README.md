@@ -1,5 +1,7 @@
 # 🎮 GameBox — Classic Browser Games
 
+> **Tip:** a simple `npm run lint` command is available to check JavaScript style (requires installing dev dependencies).
+
 A beginner-friendly, open-source collection of classic browser games built entirely with **HTML, CSS, and vanilla JavaScript**. Play in your browser, learn by reading the source, and contribute your own game!
 
 🌐 **Live site:** [https://saiuttejr.github.io/GameBox/](https://saiuttejr.github.io/GameBox/)
@@ -14,7 +16,7 @@ A beginner-friendly, open-source collection of classic browser games built entir
 | [Hangman](hangman/) | Guess the word before you run out of chances | Solo |
 | [Rock, Paper, Scissors](rock-paper-scissors/) | The timeless hand game vs. the computer | vs Computer |
 | [Memory Match](memory-match/) | Flip cards and find matching pairs | Solo |
-| [Simon Game](Simon%20game/) | Repeat the color sequence — how far can you go? | Solo |
+| [Simon Game](simon-game/) | Repeat the color sequence — how far can you go? | Solo |
 | [BlackJack](BlackJack/) | Get as close to 21 as possible | Solo |
 
 ---
@@ -27,6 +29,11 @@ git clone https://github.com/Sai-Uttej-R/GameBox.git
 
 # 2. Open in your browser
 # Just open index.html — no build step required!
+```
+
+```bash
+# optionally install dev tools and run linter
+npm install && npm run lint
 ```
 
 Each game lives in its own folder with three files:

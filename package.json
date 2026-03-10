@@ -7,5 +7,18 @@
     "type": "git",
     "url": "https://github.com/Sai-Uttej-R/GameBox.git"
   },
-  "keywords": ["games", "javascript", "beginner", "open-source", "browser-games"]
+  "keywords": [
+    "games",
+    "javascript",
+    "beginner",
+    "open-source",
+    "browser-games"
+  ],
+  "type": "module",
+  "scripts": {
+    "lint": "eslint . --ext .js"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1"
+  }
 }
